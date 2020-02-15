@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (c) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (c) 2020 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
  * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
@@ -314,13 +314,18 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
       #endif
 
       #if ENABLED(CNC_COORDINATE_SYSTEMS)
-        case 53: G53(); break;
-        case 54: G54(); break;
-        case 55: G55(); break;
-        case 56: G56(); break;
-        case 57: G57(); break;
-        case 58: G58(); break;
-        case 59: G59(); break;
+        case 53: G53(); break;                                    // G53: (prefix) Apply native workspace
+        case 54: G54(); break;                                    // G54: Switch to Workspace 1
+        case 55: G55(); break;                                    // G55: Switch to Workspace 2
+        case 56: G56(); break;                                    // G56: Switch to Workspace 3
+        case 57: G57(); break;                                    // G57: Switch to Workspace 4
+        case 58: G58(); break;                                    // G58: Switch to Workspace 5
+        case 59: G59(); break;                                    // G59.0 - G59.3: Switch to Workspace 6-9
+      #endif
+
+      #if SAVED_POSITIONS
+        case 60: G60(); break;                                    // G60:  save current position
+        case 61: G61(); break;                                    // G61:  Apply/restore saved coordinates.
       #endif
 
       #if ENABLED(PROBE_TEMP_COMPENSATION)
@@ -348,7 +353,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 800: parser.debug(); break;                          // G800: GCode Parser Test for G
       #endif
 
-      default: parser.unknown_command_error(); break;
+      default: parser.unknown_command_warning(); break;
     }
     break;
 
@@ -851,7 +856,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 7219: M7219(); break;                                // M7219: Set LEDs, columns, and rows
       #endif
 
-      default: parser.unknown_command_error(); break;
+      default: parser.unknown_command_warning(); break;
     }
     break;
 
@@ -861,7 +866,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
       #if ENABLED(WIFI_CUSTOM_COMMAND)
         if (wifi_custom_command(parser.command_ptr)) break;
       #endif
-      parser.unknown_command_error();
+      parser.unknown_command_warning();
   }
 
   if (!no_ok) queue.ok_to_send();
