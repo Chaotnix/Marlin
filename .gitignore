@@ -184,3 +184,5 @@ cmake-build-*
 
 #Python
 __pycache__
+Marlin/Configuration copy.h
+Marlin/Configuration_adv copy.h
